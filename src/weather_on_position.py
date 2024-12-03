@@ -43,7 +43,7 @@ def translate_weather_code(weather_code):
     elif weather_code // 100 == 8:
         # 구름 낀 날씨의 경우
         return 1
-    elif weather_code // 100 == 3 or weather_code // 100 == 4:
+    elif weather_code // 100 == 3 or weather_code // 100 == 4 or weather_code // 100 == 5:
         # 비오는 날씨의 경우
         return 2
     elif weather_code // 100 == 6:

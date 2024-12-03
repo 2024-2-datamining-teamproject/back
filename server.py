@@ -9,14 +9,16 @@ from src.recommendation import recommend_by_knn, recommend_by_prediction
 from src.Content_based_Filtering_Title import get_similar_movies
 from src.weather_on_position import movie_weather_recommender
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from flask_cors import CORS
 
 MAX_WORKERS = 5  # 동시에 처리할 최대 스레드 수
 
 def fetch_movie_details(movie_id):
     """Fetch movie details from OMDB API with a timeout."""
+    imdb_id = links_df.loc[links_df['movieId'] == movie_id, 'imdbId']
     try:
         response = requests.get(
-            poster_api.format(API_KEY, movie_id),
+            poster_api.format(API_KEY, imdb_id.values[0]),
             timeout=2  # 타임아웃 2초
         )
         data = response.json()
@@ -46,6 +48,7 @@ def fetch_movie_details_concurrent(movie_ids):
 
 
 app = Flask(__name__)
+CORS(app)
 
 # Load environment variables and CSV files
 load_dotenv()
@@ -56,19 +59,20 @@ placeholder = "https://via.placeholder.com/200x300"
 ratings_df = pd.read_csv("csv/ratings.csv")
 movies_df = pd.read_csv("csv/movies.csv")
 directors_df = pd.read_csv("csv/directors.csv")
+links_df = pd.read_csv("csv/links.csv")
 
-def fetch_movie_details(movie_id):
-    """Fetch movie details from OMDB API."""
-    try:
-        response = requests.get(poster_api.format(API_KEY, movie_id))
-        data = response.json()
-        return {
-            "title": data.get("Title", "Error Title"),
-            "poster": data.get("Poster", placeholder)
-        }
-    except Exception as e:
-        print(f"Error fetching movie details for ID {movie_id}: {e}")
-        return {"title": "Error Title", "poster": placeholder}
+#def fetch_movie_details(movie_id):
+#    """Fetch movie details from OMDB API."""
+#    try:
+#        response = requests.get(poster_api.format(API_KEY, links_df.loc[links_df['movieId'] == movie_id, 'imdbId']))
+#        data = response.json()
+#        return {
+#            "title": data.get("Title", "Error Title"),
+#            "poster": data.get("Poster", placeholder)
+#        }
+#    except Exception as e:
+#        print(f"Error fetching movie details for ID {movie_id}: {e}")
+#        return {"title": "Error Title", "poster": placeholder}
 
 @app.route('/login', methods=['POST'])
 def login():
