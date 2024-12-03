@@ -153,7 +153,7 @@ def search():
     response = {}
     try:
         results = get_similar_movies_by_keyword(keyword)
-        response["keyword_movies"] = [fetch_movie_details(movie_id) for movie_id in results]
+        response["keyword_movies"] = fetch_movie_details_concurrent(results)
     except Exception as e:
         print(f"Error in get_similar_movies_by_keyword: {e}")
         response["keyword_movies"] = []
